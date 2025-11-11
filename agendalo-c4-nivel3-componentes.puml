@@ -1,0 +1,103 @@
+@startuml Agendalo_Components_Level3
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+title Nivel 3: Diagrama de Componentes - API Backend Agendalo
+
+Container(api, "Agendalo Backend API", "Spring Boot", "API REST principal")
+
+System_Boundary(controllers, "Controllers Layer") {
+    Component(userController, "UserController", "Spring Controller", "Gestión de usuarios")
+    Component(companyController, "CompanyController", "Spring Controller", "Gestión de empresas")
+    Component(appointmentController, "AppointmentController", "Spring Controller", "Gestión de citas")
+    Component(mercadoPagoController, "MercadoPagoController", "Spring Controller", "Gestión de pagos")
+    Component(calendarController, "GoogleCalendarController", "Spring Controller", "Sincronización calendario")
+    Component(imageController, "ImageController", "Spring Controller", "Gestión de imágenes")
+    Component(commentController, "CommentController", "Spring Controller", "Comentarios")
+    Component(couponController, "CouponController", "Spring Controller", "Cupones")
+    Component(contactController, "ContactFormController", "Spring Controller", "Formularios de contacto")
+}
+
+System_Boundary(services, "Services Layer") {
+    Component(userService, "UserService", "Spring Service", "Lógica de usuarios")
+    Component(companyService, "CompanyService", "Spring Service", "Lógica de empresas")
+    Component(appointmentService, "AppointmentService", "Spring Service", "Lógica de citas")
+    Component(mercadoPagoService, "MercadoPagoService", "Spring Service", "Lógica de pagos")
+    Component(calendarService, "GoogleCalendarService", "Spring Service", "Lógica de calendario")
+    Component(imageService, "ImageService", "Spring Service", "Lógica de imágenes")
+    Component(commentService, "CommentService", "Spring Service", "Lógica de comentarios")
+    Component(couponService, "CouponService", "Spring Service", "Lógica de cupones")
+    Component(contactService, "ContactFormService", "Spring Service", "Lógica de formularios")
+    Component(emailService, "EmailService", "Spring Service", "Envío de emails")
+}
+
+System_Boundary(security, "Security & Config") {
+    Component(securityConfig, "SecurityConfig", "Spring Config", "Configuración de seguridad")
+    Component(jwtFilter, "JWTAuthFilter", "Spring Filter", "Filtro JWT")
+    Component(corsConfig, "CorsConfig", "Spring Config", "Configuración CORS")
+    Component(rateLimiter, "RateLimiterConfig", "Spring Config", "Rate limiting")
+}
+
+System_Boundary(data, "Data Layer") {
+    Component(userRepo, "UserRepository", "Spring Data JPA", "Acceso a datos de usuarios")
+    Component(companyRepo, "CompanyRepository", "Spring Data JPA", "Acceso a datos de empresas")
+    Component(appointmentRepo, "AppointmentRepository", "Spring Data JPA", "Acceso a datos de citas")
+    Component(paymentRepo, "PaymentPreferenceRepository", "Spring Data JPA", "Acceso a datos de pagos")
+    Component(imageRepo, "ImageRepository", "Spring Data JPA", "Acceso a datos de imágenes")
+    Component(commentRepo, "CommentRepository", "Spring Data JPA", "Acceso a datos de comentarios")
+    Component(couponRepo, "CouponRepository", "Spring Data JPA", "Acceso a datos de cupones")
+    Component(contactRepo, "ContactFormRepository", "Spring Data JPA", "Acceso a datos de formularios")
+}
+
+System_Boundary(external, "External Services") {
+    System_Ext(mercadopago, "MercadoPago API", "API de pagos")
+    System_Ext(google, "Google APIs", "OAuth y Calendar")
+    System_Ext(sendgrid, "SendGrid API", "API de emails")
+    ContainerDb(mysql, "MySQL Database", "Base de datos")
+}
+
+' Relaciones Controllers -> Services
+Rel(userController, userService, "Usa", "Internal")
+Rel(companyController, companyService, "Usa", "Internal")
+Rel(appointmentController, appointmentService, "Usa", "Internal")
+Rel(mercadoPagoController, mercadoPagoService, "Usa", "Internal")
+Rel(calendarController, calendarService, "Usa", "Internal")
+Rel(imageController, imageService, "Usa", "Internal")
+Rel(commentController, commentService, "Usa", "Internal")
+Rel(couponController, couponService, "Usa", "Internal")
+Rel(contactController, contactService, "Usa", "Internal")
+
+' Relaciones Services -> Repositories
+Rel(userService, userRepo, "Usa", "Internal")
+Rel(companyService, companyRepo, "Usa", "Internal")
+Rel(appointmentService, appointmentRepo, "Usa", "Internal")
+Rel(mercadoPagoService, paymentRepo, "Usa", "Internal")
+Rel(imageService, imageRepo, "Usa", "Internal")
+Rel(commentService, commentRepo, "Usa", "Internal")
+Rel(couponService, couponRepo, "Usa", "Internal")
+Rel(contactService, contactRepo, "Usa", "Internal")
+
+' Relaciones Services -> Email
+Rel(userService, emailService, "Usa", "Internal")
+Rel(appointmentService, emailService, "Usa", "Internal")
+Rel(companyService, emailService, "Usa", "Internal")
+
+' Relaciones Services -> External
+Rel(mercadoPagoService, mercadopago, "Procesa pagos", "HTTPS/REST")
+Rel(calendarService, google, "Sincroniza", "HTTPS/REST")
+Rel(emailService, sendgrid, "Envía emails", "HTTPS/REST")
+
+' Relaciones Repositories -> Database
+Rel(userRepo, mysql, "CRUD", "JDBC")
+Rel(companyRepo, mysql, "CRUD", "JDBC")
+Rel(appointmentRepo, mysql, "CRUD", "JDBC")
+Rel(paymentRepo, mysql, "CRUD", "JDBC")
+Rel(imageRepo, mysql, "CRUD", "JDBC")
+Rel(commentRepo, mysql, "CRUD", "JDBC")
+Rel(couponRepo, mysql, "CRUD", "JDBC")
+Rel(contactRepo, mysql, "CRUD", "JDBC")
+
+' Webhooks
+Rel(mercadopago, mercadoPagoController, "Webhooks", "HTTPS")
+Rel(google, userService, "OAuth Callbacks", "HTTPS")
+
+@enduml

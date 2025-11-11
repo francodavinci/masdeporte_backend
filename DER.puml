@@ -1,0 +1,219 @@
+@startuml DER_MasDeporte
+title DER - Plataforma MasDeporte
+left to right direction
+!theme plain
+hide circle
+
+skinparam entity {
+  BackgroundColor #f8f9fa
+  BorderColor #444
+}
+
+' =============================
+' USUARIOS Y PERMISOS
+' =============================
+entity "user" as user {
+  * id : bigint <<PK>>
+  --
+  email : varchar(255)
+  password : varchar(255)
+  phone_number : varchar(255)
+  profile_image_url : varchar(255)
+  role : varchar(255)
+  name : varchar(255)
+  registration_date : datetime
+}
+
+entity "provider" as provider {
+  * id : bigint <<PK>>
+  --
+  company_id : bigint <<FK>>
+  user_id : bigint <<FK UNIQUE>>
+}
+
+' =============================
+' COMERCIOS Y CONFIGURACIÓN
+' =============================
+entity "company" as company {
+  * id : bigint <<PK>>
+  --
+  name : varchar(255)
+  address : varchar(255)
+  phone : varchar(255)
+  category : varchar(255)
+  url_slug : varchar(50)
+  owner_id : bigint <<FK>>
+  latitude : double
+  longitude : double
+  registration_date : datetime
+  cancellation_hours : int
+  has_time_between_turns : bit
+  minutes_between_turns : int
+  min_advance_days : int
+  max_advance_days : int
+  status : enum('PENDING','CANCELLED','ACCEPTED','DELETED')
+}
+
+entity "business_hours" as hours {
+  * id : bigint <<PK>>
+  --
+  day_of_week : enum('MONDAY','TUESDAY','...','SUNDAY')
+  opening_time : time
+  closing_time : time
+  is_working_day : bit
+  company_id : bigint <<FK>>
+}
+
+entity "business_service" as service {
+  * id : bigint <<PK>>
+  --
+  name : varchar(255)
+  description : text
+  duration_minutes : int
+  price : double
+  is_active : bit
+  company_id : bigint <<FK>>
+}
+
+entity "images" as images {
+  * id : bigint <<PK>>
+  --
+  name : varchar(255)
+  type : varchar(255)
+  image_type : enum('LOGO','GALLERY','PROFILE')
+  data : mediumblob
+  company_id : bigint <<FK>>
+}
+
+entity "comments" as comments {
+  * id : bigint <<PK>>
+  --
+  description : varchar(1000)
+  points : int
+  user_name : varchar(255)
+  created_at : datetime
+  company_id : bigint <<FK>>
+  user_id : bigint <<FK>>
+}
+
+' =============================
+' CUPONES
+' =============================
+entity "coupon" as coupon {
+  * id : bigint <<PK>>
+  --
+  code : varchar(20)
+  name : varchar(255)
+  description : varchar(500)
+  discount_percentage : double
+  max_discount_amount : double
+  max_uses : int
+  current_uses : int
+  valid_from : datetime
+  valid_until : datetime
+  is_active : bit
+  company_id : bigint <<FK>>
+}
+
+entity "coupon_usage" as coupon_usage {
+  * id : bigint <<PK>>
+  --
+  discount_amount : double
+  final_amount : double
+  original_amount : double
+  used_at : datetime
+  appointment_id : bigint <<FK>>
+  coupon_id : bigint <<FK>>
+  user_id : bigint <<FK>>
+}
+
+' =============================
+' TURNOS Y PAGOS
+' =============================
+entity "appointment" as appointment {
+  * id : bigint <<PK>>
+  --
+  start_time : datetime
+  end_time : datetime
+  status : enum('PENDING','CONFIRMED','CANCELLED','COMPLETED')
+  notes : varchar(255)
+  payment_id : varchar(255)
+  coupon_code : varchar(255)
+  final_price : double
+  company_id : bigint <<FK>>
+  service_id : bigint <<FK>>
+  user_id : bigint <<FK>>
+}
+
+entity "payment_preference" as preference {
+  * id : bigint <<PK>>
+  --
+  amount : double
+  preference_id : varchar(255)
+  external_reference : varchar(255)
+  start_time : datetime
+  status : varchar(255)
+  company_id : bigint <<FK>>
+  service_id : bigint <<FK>>
+  user_id : bigint <<FK>>
+}
+
+' =============================
+' INTEGRACIONES EXTERNAS
+' =============================
+entity "google_calendar_tokens" as gcal {
+  * id : bigint <<PK>>
+  --
+  access_token : text
+  refresh_token : text
+  expires_at : datetime
+  created_at : datetime
+  company_id : bigint <<FK UNIQUE>>
+}
+
+entity "mercado_pago_account" as mpago {
+  * id : bigint <<PK>>
+  --
+  access_token : varchar(255)
+  refresh_token : varchar(255)
+  public_key : varchar(255)
+  status : varchar(255)
+  user_id : varchar(255)
+  expires_at : datetime
+  last_sync : datetime
+  company_id : bigint <<FK UNIQUE>>
+}
+
+' =============================
+' RELACIONES
+' =============================
+
+' --- Usuarios y compañías
+user ||--o{ company : "owner_id"
+user ||--o{ provider
+user ||--o{ appointment
+user ||--o{ comments
+user ||--o{ coupon_usage
+user ||--o{ preference
+
+' --- Company relaciones
+company ||--o{ provider
+company ||--o{ service
+company ||--o{ hours
+company ||--o{ appointment
+company ||--o{ comments
+company ||--o{ coupon
+company ||--o{ images
+company ||--o{ preference
+company ||--|| gcal : "1:1"
+company ||--|| mpago : "1:1"
+
+' --- Services y horarios
+service ||--o{ appointment
+service ||--o{ preference
+
+' --- Cupones
+coupon ||--o{ coupon_usage
+appointment ||--o{ coupon_usage
+
+@enduml

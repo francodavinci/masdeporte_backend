@@ -1,0 +1,376 @@
+@startuml Agendalo C4 Model
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Deployment.puml
+
+title Sistema Agendalo - Modelo C4
+
+' ==========================================
+' NIVEL 1: DIAGRAMA DE CONTEXTO
+' ==========================================
+
+@startuml Agendalo_Context
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+title Diagrama de Contexto - Sistema Agendalo
+
+Person(clientes, "Clientes", "Usuarios que reservan citas y servicios")
+Person(propietarios, "Propietarios", "Dueños de empresas que gestionan sus servicios")
+Person(administradores, "Administradores", "Personal que administra el sistema")
+
+System(agendalo, "Agendalo Platform", "Sistema de gestión de citas y reservas que conecta empresas con clientes")
+
+System_Ext(mercadopago, "MercadoPago", "Plataforma de procesamiento de pagos")
+System_Ext(google, "Google Services", "Servicios de Google (OAuth, Calendar)")
+System_Ext(sendgrid, "SendGrid", "Servicio de envío de emails transaccionales")
+SystemDb(mysql, "MySQL Database", "Base de datos principal del sistema")
+
+Rel(clientes, agendalo, "Reserva citas", "HTTPS/REST")
+Rel(propietarios, agendalo, "Gestiona empresa", "HTTPS/REST")
+Rel(administradores, agendalo, "Administra sistema", "HTTPS/REST")
+
+Rel(agendalo, mercadopago, "Procesa pagos", "HTTPS/REST")
+Rel(agendalo, google, "Autenticación y calendario", "HTTPS/REST")
+Rel(agendalo, sendgrid, "Envía notificaciones", "HTTPS/REST")
+Rel(agendalo, mysql, "Almacena datos", "JDBC")
+
+Rel(mercadopago, agendalo, "Webhooks de pago", "HTTPS")
+Rel(google, agendalo, "Callbacks OAuth", "HTTPS")
+
+@enduml
+
+' ==========================================
+' NIVEL 2: DIAGRAMA DE CONTENEDORES
+' ==========================================
+
+@startuml Agendalo_Containers
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+title Diagrama de Contenedores - Sistema Agendalo
+
+Person(clientes, "Clientes", "Usuarios que reservan citas")
+Person(propietarios, "Propietarios", "Dueños de empresas")
+
+System_Boundary(usuarios, "Usuarios") {
+    Container(webapp, "Frontend Web", "React/Vue.js", "Aplicación web para gestión de citas")
+    Container(mobile, "Mobile App", "React Native/Flutter", "Aplicación móvil")
+}
+
+System_Boundary(backend, "Agendalo Backend") {
+    Container(api, "API Gateway", "Spring Boot", "REST API principal")
+    Container(auth, "Auth Service", "Spring Security", "Autenticación JWT + OAuth")
+    Container(email, "Email Service", "SendGrid Integration", "Envío de notificaciones")
+    Container(payment, "Payment Service", "MercadoPago Integration", "Procesamiento de pagos")
+    Container(calendar, "Calendar Service", "Google Calendar API", "Sincronización de calendarios")
+}
+
+System_Boundary(almacenamiento, "Almacenamiento") {
+    ContainerDb(database, "MySQL Database", "MySQL", "Datos principales del sistema")
+    Container(files, "File Storage", "File System", "Imágenes y documentos")
+}
+
+System_Boundary(externos, "Servicios Externos") {
+    System_Ext(mercadopago, "MercadoPago API", "API de pagos")
+    System_Ext(google, "Google APIs", "OAuth y Calendar")
+    System_Ext(sendgrid, "SendGrid API", "API de emails")
+}
+
+Rel(clientes, webapp, "Usa", "HTTPS")
+Rel(clientes, mobile, "Usa", "HTTPS")
+Rel(propietarios, webapp, "Usa", "HTTPS")
+Rel(propietarios, mobile, "Usa", "HTTPS")
+
+Rel(webapp, api, "HTTPS/REST", "JSON")
+Rel(mobile, api, "HTTPS/REST", "JSON")
+
+Rel(api, auth, "Usa", "Internal")
+Rel(api, email, "Usa", "Internal")
+Rel(api, payment, "Usa", "Internal")
+Rel(api, calendar, "Usa", "Internal")
+
+Rel(auth, google, "Autentica", "HTTPS/REST")
+Rel(email, sendgrid, "Envía emails", "HTTPS/REST")
+Rel(payment, mercadopago, "Procesa pagos", "HTTPS/REST")
+Rel(calendar, google, "Sincroniza", "HTTPS/REST")
+
+Rel(api, database, "CRUD", "JDBC")
+Rel(api, files, "Almacena", "File I/O")
+
+Rel(mercadopago, api, "Webhooks", "HTTPS")
+Rel(google, auth, "OAuth Callbacks", "HTTPS")
+
+@enduml
+
+' ==========================================
+' NIVEL 3: DIAGRAMA DE COMPONENTES
+' ==========================================
+
+@startuml Agendalo_Components
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+title Diagrama de Componentes - API Backend Agendalo
+
+Container(api, "Agendalo Backend API", "Spring Boot", "API REST principal")
+
+System_Boundary(controllers, "Controllers Layer") {
+    Component(userController, "UserController", "Spring Controller", "Gestión de usuarios")
+    Component(companyController, "CompanyController", "Spring Controller", "Gestión de empresas")
+    Component(appointmentController, "AppointmentController", "Spring Controller", "Gestión de citas")
+    Component(mercadoPagoController, "MercadoPagoController", "Spring Controller", "Gestión de pagos")
+    Component(calendarController, "GoogleCalendarController", "Spring Controller", "Sincronización calendario")
+    Component(imageController, "ImageController", "Spring Controller", "Gestión de imágenes")
+    Component(commentController, "CommentController", "Spring Controller", "Comentarios")
+    Component(couponController, "CouponController", "Spring Controller", "Cupones")
+    Component(contactController, "ContactFormController", "Spring Controller", "Formularios de contacto")
+}
+
+System_Boundary(services, "Services Layer") {
+    Component(userService, "UserService", "Spring Service", "Lógica de usuarios")
+    Component(companyService, "CompanyService", "Spring Service", "Lógica de empresas")
+    Component(appointmentService, "AppointmentService", "Spring Service", "Lógica de citas")
+    Component(mercadoPagoService, "MercadoPagoService", "Spring Service", "Lógica de pagos")
+    Component(calendarService, "GoogleCalendarService", "Spring Service", "Lógica de calendario")
+    Component(imageService, "ImageService", "Spring Service", "Lógica de imágenes")
+    Component(commentService, "CommentService", "Spring Service", "Lógica de comentarios")
+    Component(couponService, "CouponService", "Spring Service", "Lógica de cupones")
+    Component(contactService, "ContactFormService", "Spring Service", "Lógica de formularios")
+    Component(emailService, "EmailService", "Spring Service", "Envío de emails")
+}
+
+System_Boundary(security, "Security & Config") {
+    Component(securityConfig, "SecurityConfig", "Spring Config", "Configuración de seguridad")
+    Component(jwtFilter, "JWTAuthFilter", "Spring Filter", "Filtro JWT")
+    Component(corsConfig, "CorsConfig", "Spring Config", "Configuración CORS")
+    Component(rateLimiter, "RateLimiterConfig", "Spring Config", "Rate limiting")
+}
+
+System_Boundary(data, "Data Layer") {
+    Component(userRepo, "UserRepository", "Spring Data JPA", "Acceso a datos de usuarios")
+    Component(companyRepo, "CompanyRepository", "Spring Data JPA", "Acceso a datos de empresas")
+    Component(appointmentRepo, "AppointmentRepository", "Spring Data JPA", "Acceso a datos de citas")
+    Component(paymentRepo, "PaymentPreferenceRepository", "Spring Data JPA", "Acceso a datos de pagos")
+    Component(imageRepo, "ImageRepository", "Spring Data JPA", "Acceso a datos de imágenes")
+    Component(commentRepo, "CommentRepository", "Spring Data JPA", "Acceso a datos de comentarios")
+    Component(couponRepo, "CouponRepository", "Spring Data JPA", "Acceso a datos de cupones")
+    Component(contactRepo, "ContactFormRepository", "Spring Data JPA", "Acceso a datos de formularios")
+}
+
+System_Boundary(external, "External Services") {
+    System_Ext(mercadopago, "MercadoPago API", "API de pagos")
+    System_Ext(google, "Google APIs", "OAuth y Calendar")
+    System_Ext(sendgrid, "SendGrid API", "API de emails")
+    ContainerDb(mysql, "MySQL Database", "Base de datos")
+}
+
+' Relaciones Controllers -> Services
+Rel(userController, userService, "Usa", "Internal")
+Rel(companyController, companyService, "Usa", "Internal")
+Rel(appointmentController, appointmentService, "Usa", "Internal")
+Rel(mercadoPagoController, mercadoPagoService, "Usa", "Internal")
+Rel(calendarController, calendarService, "Usa", "Internal")
+Rel(imageController, imageService, "Usa", "Internal")
+Rel(commentController, commentService, "Usa", "Internal")
+Rel(couponController, couponService, "Usa", "Internal")
+Rel(contactController, contactService, "Usa", "Internal")
+
+' Relaciones Services -> Repositories
+Rel(userService, userRepo, "Usa", "Internal")
+Rel(companyService, companyRepo, "Usa", "Internal")
+Rel(appointmentService, appointmentRepo, "Usa", "Internal")
+Rel(mercadoPagoService, paymentRepo, "Usa", "Internal")
+Rel(imageService, imageRepo, "Usa", "Internal")
+Rel(commentService, commentRepo, "Usa", "Internal")
+Rel(couponService, couponRepo, "Usa", "Internal")
+Rel(contactService, contactRepo, "Usa", "Internal")
+
+' Relaciones Services -> Email
+Rel(userService, emailService, "Usa", "Internal")
+Rel(appointmentService, emailService, "Usa", "Internal")
+Rel(companyService, emailService, "Usa", "Internal")
+
+' Relaciones Services -> External
+Rel(mercadoPagoService, mercadopago, "Procesa pagos", "HTTPS/REST")
+Rel(calendarService, google, "Sincroniza", "HTTPS/REST")
+Rel(emailService, sendgrid, "Envía emails", "HTTPS/REST")
+
+' Relaciones Repositories -> Database
+Rel(userRepo, mysql, "CRUD", "JDBC")
+Rel(companyRepo, mysql, "CRUD", "JDBC")
+Rel(appointmentRepo, mysql, "CRUD", "JDBC")
+Rel(paymentRepo, mysql, "CRUD", "JDBC")
+Rel(imageRepo, mysql, "CRUD", "JDBC")
+Rel(commentRepo, mysql, "CRUD", "JDBC")
+Rel(couponRepo, mysql, "CRUD", "JDBC")
+Rel(contactRepo, mysql, "CRUD", "JDBC")
+
+' Webhooks
+Rel(mercadopago, mercadoPagoController, "Webhooks", "HTTPS")
+Rel(google, userService, "OAuth Callbacks", "HTTPS")
+
+@enduml
+
+' ==========================================
+' NIVEL 4: DIAGRAMA DE CÓDIGO - ENTIDADES
+' ==========================================
+
+@startuml Agendalo_Entities
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+title Diagrama de Entidades de Dominio - Sistema Agendalo
+entity "USER" as user {
+    * id : Long PK
+    --
+    * email : String UK
+    * password : String
+    phoneNumber : String
+    name : String
+    * role : String
+    profileImageUrl : String
+}
+
+entity "COMPANY" as company {
+    * id : Long PK
+    --
+    * owner_id : Long FK
+    * name : String
+    * urlSlug : String UK
+    * category : String
+    address : String
+    latitude : Double
+    longitude : Double
+    phone : String
+    * minAdvanceDays : Integer
+    * maxAdvanceDays : Integer
+    hasTimeBetweenTurns : Boolean
+    minutesBetweenTurns : Integer
+    * status : CompanyStatus
+    * registrationDate : LocalDateTime
+    * cancellationHours : Integer
+}
+
+entity "BUSINESS_SERVICE" as businessService {
+    * id : Long PK
+    --
+    * company_id : Long FK
+    * name : String
+    description : String
+    * durationMinutes : Integer
+    * price : Double
+}
+
+entity "APPOINTMENT" as appointment {
+    * id : Long PK
+    --
+    * service_id : Long FK
+    * user_id : Long FK
+    * company_id : Long FK
+    * startTime : LocalDateTime
+    * endTime : LocalDateTime
+    * status : AppointmentStatus
+    notes : String
+    * paymentId : String
+    finalPrice : Double
+    couponCode : String
+    createdAt : LocalDateTime
+    updatedAt : LocalDateTime
+}
+
+entity "PAYMENT_PREFERENCE" as paymentPreference {
+    * id : Long PK
+    --
+    * preferenceId : String UK
+    * service_id : Long FK
+    * user_id : Long FK
+    * company_id : Long FK
+    * startTime : LocalDateTime
+    notes : String
+    * amount : Double
+    status : String
+    externalReference : String
+    createdAt : LocalDateTime
+    updatedAt : LocalDateTime
+}
+
+entity "BUSINESS_HOURS" as businessHours {
+    * id : Long PK
+    --
+    * company_id : Long FK
+    * dayOfWeek : DayOfWeek
+    * openingTime : LocalTime
+    * closingTime : LocalTime
+    * workingDay : Boolean
+}
+
+entity "PROVIDER" as provider {
+    * id : Long PK
+    --
+    * user_id : Long FK
+    * company_id : Long FK
+}
+
+entity "IMAGE" as image {
+    * id : Long PK
+    --
+    * company_id : Long FK
+    fileName : String
+    originalName : String
+    contentType : String
+    size : Long
+    url : String
+    type : ImageType
+}
+
+entity "COMMENT" as comment {
+    * id : Long PK
+    --
+    * appointment_id : Long FK
+    content : String
+    rating : Integer
+    createdAt : LocalDateTime
+}
+
+entity "COUPON" as coupon {
+    * id : Long PK
+    --
+    * code : String UK
+    description : String
+    discountPercentage : Double
+    discountAmount : Double
+    validFrom : LocalDateTime
+    validUntil : LocalDateTime
+    maxUses : Integer
+    currentUses : Integer
+    isActive : Boolean
+}
+
+entity "CONTACT_FORM" as contactForm {
+    * id : Long PK
+    --
+    name : String
+    email : String
+    subject : String
+    message : String
+    createdAt : LocalDateTime
+    isRead : Boolean
+}
+
+' Relaciones
+user ||--o{ company : "owns"
+user ||--o{ appointment : "books"
+user ||--o{ provider : "is"
+
+company ||--o{ businessService : "offers"
+company ||--o{ businessHours : "has"
+company ||--o{ appointment : "receives"
+company ||--o{ image : "has"
+company ||--o{ provider : "employs"
+
+businessService ||--o{ appointment : "booked_for"
+businessService ||--o{ paymentPreference : "generates"
+
+appointment ||--|| paymentPreference : "has"
+appointment ||--o{ comment : "has"
+
+@enduml

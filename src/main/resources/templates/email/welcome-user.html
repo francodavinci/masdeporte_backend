@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¡Bienvenido a MasDeporte!</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 10px;
+        }
+        .welcome-title {
+            color: #28a745;
+            font-size: 24px;
+            margin: 0;
+        }
+        .welcome-message {
+            background-color: #e7f3ff;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+            border-left: 4px solid #007bff;
+        }
+        .features {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .feature-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px 0;
+        }
+        .feature-icon {
+            background-color: #007bff;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-weight: bold;
+        }
+        .feature-text {
+            flex: 1;
+        }
+        .cta-section {
+            text-align: center;
+            margin: 30px 0;
+        }
+        .button {
+            display: inline-block;
+            background-color: #007bff;
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            margin: 10px;
+            transition: background-color 0.3s;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+        .button-secondary {
+            background-color: #28a745;
+        }
+        .button-secondary:hover {
+            background-color: #1e7e34;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            color: #666;
+            font-size: 14px;
+        }
+        .social-links {
+            margin: 20px 0;
+        }
+        .social-links a {
+            color: #007bff;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+        .highlight {
+            background-color: #fff3cd;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            border-left: 4px solid #ffc107;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">MasDeporte</div>
+            <h1 class="welcome-title">¡Bienvenido a MasDeporte!</h1>
+        </div>
+
+        <div class="welcome-message">
+            <p>¡Hola <strong th:text="${user.name}">Usuario</strong>!</p>
+            <p>¡Estamos emocionados de tenerte en nuestra plataforma! Tu cuenta ha sido creada exitosamente y ya puedes comenzar a disfrutar de todos nuestros servicios.</p>
+        </div>
+
+        <div class="features">
+            <h3>🎉 ¿Qué puedes hacer en MasDeporte?</h3>
+            
+            <div class="feature-item">
+                <div class="feature-icon">📅</div>
+                <div class="feature-text">
+                    <strong>Reservar turnos</strong><br>
+                    Encuentra y reserva turnos con las mejores empresas de tu zona
+                </div>
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-icon">🏢</div>
+                <div class="feature-text">
+                    <strong>Gestionar tu empresa</strong><br>
+                    Si eres proveedor, administra tus servicios y horarios
+                </div>
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-icon">💳</div>
+                <div class="feature-text">
+                    <strong>Pagos seguros</strong><br>
+                    Realiza pagos de forma segura con MercadoPago
+                </div>
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-icon">📱</div>
+                <div class="feature-text">
+                    <strong>Notificaciones</strong><br>
+                    Recibe confirmaciones y recordatorios por email
+                </div>
+            </div>
+        </div>
+
+        <div class="highlight">
+            <h4>💡 Consejos para empezar:</h4>
+            <ul>
+                <li>Completa tu perfil con información actualizada</li>
+                <li>Explora las diferentes categorías de servicios</li>
+                <li>Lee las reseñas de otros usuarios</li>
+                <li>Configura tus notificaciones preferidas</li>
+            </ul>
+        </div>
+
+        <div class="footer">
+            <p>Gracias por elegir MasDeporte</p>
+            <p><small>Este es un email automático, por favor no respondas a este mensaje.</small></p>
+        </div>
+    </div>
+</body>
+</html>

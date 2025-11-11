@@ -1,0 +1,103 @@
+@startuml Agendalo_Containers_Level2
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+title Nivel 2: Diagrama de Contenedores - Sistema MasDeporte
+
+Person(clientes, "Clientes", "Reservan citas y servicios")
+Person(propietarios, "Propietarios", "Gestionan empresas y servicios")
+Person(administradores, "Administradores", "Administran el sistema")
+
+System_Boundary(usuarios, "Capa de Presentación") {
+    Container(webapp, "Frontend Web", "React + TypeScript", "Aplicación web responsive para gestión de citas")
+    Container(mobile, "Mobile App", "React Native", "Aplicación móvil multiplataforma")
+    Container(admin, "Admin Panel", "React + TypeScript", "Panel de administración del sistema")
+}
+
+System_Boundary(backend, "MasDeporte Backend") {
+    Container(api, "API Gateway", "Spring Boot 3.2.3", "REST API principal con documentación OpenAPI")
+    Container(auth, "Auth Service", "Spring Security + JWT", "Autenticación y autorización")
+    Container(email, "Email Service", "SendGrid + Thymeleaf", "Envío de notificaciones transaccionales")
+    Container(payment, "Payment Service", "MercadoPago SDK", "Procesamiento de pagos y webhooks")
+    Container(calendar, "Calendar Service", "Google Calendar API", "Sincronización bidireccional de calendarios")
+}
+
+System_Boundary(almacenamiento, "Capa de Datos") {
+    ContainerDb(database, "MySQL Database", "MySQL 8.0", "Base de datos principal con JPA/Hibernate")
+    Container(files, "File Storage", "Local File System", "Almacenamiento de imágenes y documentos")
+    Container(cache, "Redis Cache", "Redis", "Cache para sesiones y datos temporales")
+}
+
+System_Boundary(externos, "Servicios Externos") {
+    System_Ext(mercadopago, "MercadoPago API", "API REST de pagos")
+    System_Ext(google, "Google APIs", "OAuth 2.0 + Calendar API")
+    System_Ext(sendgrid, "SendGrid API", "API de envío de emails")
+    System_Ext(cloudflare, "Cloudflare", "CDN y protección DDoS")
+}
+
+' Relaciones Usuarios -> Frontend
+Rel(clientes, webapp, "Reserva citas", "HTTPS")
+Rel(clientes, mobile, "Reserva citas", "HTTPS")
+Rel(propietarios, webapp, "Gestiona empresa", "HTTPS")
+Rel(propietarios, mobile, "Gestiona empresa", "HTTPS")
+Rel(administradores, admin, "Administra sistema", "HTTPS")
+
+' Relaciones Frontend -> Backend
+Rel(webapp, api, "API Calls", "HTTPS/REST/JSON")
+Rel(mobile, api, "API Calls", "HTTPS/REST/JSON")
+Rel(admin, api, "API Calls", "HTTPS/REST/JSON")
+
+' Relaciones API Gateway -> Servicios
+Rel(api, auth, "Autentica usuarios", "Internal")
+Rel(api, email, "Envía notificaciones", "Internal")
+Rel(api, payment, "Procesa pagos", "Internal")
+Rel(api, calendar, "Sincroniza calendarios", "Internal")
+Rel(api, file, "Gestiona archivos", "Internal")
+Rel(api, notification, "Envía notificaciones", "Internal")
+
+' Relaciones Servicios -> Externos
+Rel(auth, google, "OAuth 2.0", "HTTPS/REST")
+Rel(email, sendgrid, "Envía emails", "HTTPS/REST")
+Rel(payment, mercadopago, "Procesa pagos", "HTTPS/REST")
+Rel(calendar, google, "Sincroniza eventos", "HTTPS/REST")
+
+' Relaciones Backend -> Almacenamiento
+Rel(api, database, "CRUD Operations", "JDBC")
+Rel(api, files, "File I/O", "File System")
+Rel(api, cache, "Cache Data", "Redis Protocol")
+
+' Webhooks y Callbacks
+Rel(mercadopago, payment, "Payment Webhooks", "HTTPS")
+Rel(google, auth, "OAuth Callbacks", "HTTPS")
+
+' CDN
+Rel(webapp, cloudflare, "Static Assets", "HTTPS")
+Rel(mobile, cloudflare, "API Gateway", "HTTPS")
+
+' Notas técnicas
+note right of api
+  **Tecnologías:**
+  - Spring Boot 3.2.3
+  - Java 17
+  - Maven
+  - OpenAPI/Swagger
+  - Rate Limiting
+  - CORS habilitado
+end note
+
+note right of database
+  **Esquema:**
+  - 11 tablas principales
+  - Índices optimizados
+  - Transacciones ACID
+  - Backup automático
+end note
+
+note right of payment
+  **Integración:**
+  - SDK MercadoPago
+  - Webhooks seguros
+  - Reembolsos automáticos
+  - Reportes de transacciones
+end note
+
+@enduml

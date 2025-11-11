@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Turno Cancelado - MasDeporte</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #dc3545;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #dc3545;
+        }
+        .appointment-details {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 5px 0;
+        }
+        .detail-label {
+            font-weight: bold;
+            color: #555;
+        }
+        .detail-value {
+            color: #333;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .status-cancelled {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .client-info {
+            background-color: #e7f3ff;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .refund-info {
+            background-color: #fff3cd;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            border-left: 4px solid #ffc107;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">Agendalo</div>
+            <h1>Turno Cancelado</h1>
+        </div>
+
+        <p>Hola <strong th:text="${appointment.company.owner.firstName + ' ' + appointment.company.owner.lastName}">Propietario</strong>,</p>
+        
+        <p>Se ha cancelado un turno en tu empresa <strong th:text="${appointment.company.name}">Nombre de la Empresa</strong>.</p>
+
+        <div class="appointment-details">
+            <div class="detail-row">
+                <span class="detail-label">Servicio:</span>
+                <span class="detail-value" th:text="${appointment.service.name}">Nombre del Servicio</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Fecha y Hora:</span>
+                <span class="detail-value" th:text="${#temporals.format(appointment.startTime, 'dd/MM/yyyy HH:mm')}">01/01/2024 10:00</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Estado:</span>
+                <span class="status-badge status-cancelled" th:text="${appointment.status}">CANCELADO</span>
+            </div>
+        </div>
+
+        <div class="client-info">
+            <h3>Información del Cliente</h3>
+            <div class="detail-row">
+                <span class="detail-label">Nombre:</span>
+                <span class="detail-value" th:text="${appointment.user.firstName + ' ' + appointment.user.lastName}">Nombre del Cliente</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Email:</span>
+                <span class="detail-value" th:text="${appointment.user.email}">email@cliente.com</span>
+            </div>
+        </div>
+
+        <div class="refund-info">
+            <h3>💳 Reembolso</h3>
+            <p>El reembolso del pago se procesará automáticamente al cliente. No es necesario que realices ninguna acción adicional.</p>
+        </div>
+
+        <p><strong>Próximos pasos:</strong></p>
+        <ul>
+            <li>El horario queda disponible para nuevas reservas</li>
+            <li>Puedes contactar al cliente si deseas ofrecer una nueva fecha</li>
+            <li>Revisa tu panel de administración para ver el estado actualizado</li>
+        </ul>
+
+        <div class="footer">
+            <p>Gracias por usar MasDeporte</p>
+            <p>Este es un email automático, por favor no respondas a este mensaje.</p>
+        </div>
+    </div>
+</body>
+</html>

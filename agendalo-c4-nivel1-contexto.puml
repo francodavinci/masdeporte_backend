@@ -1,0 +1,29 @@
+@startuml Agendalo_Context_Level1
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+title Nivel 1: Diagrama de Contexto - Sistema MasDeporte
+
+Person(clientes, "Clientes", "reservan citas y servicios")
+Person(propietarios, "Propietarios", "gestionan sus servicios")
+Person(administradores, "Administradores", "administra el sistema")
+
+System(masdeporte, "MasDeporte Platform", "Sistema de gestión de citas y reservas que conecta empresas con clientes")
+
+System_Ext(mercadopago, "MercadoPago", "procesamiento de pagos")
+System_Ext(google, "Google Services", "OAuth, Calendar")
+System_Ext(sendgrid, "SendGrid", "envío de emails transaccionales")
+SystemDb(mysql, "MySQL Database", "Base de datos principal del sistema")
+
+Rel(clientes, masdeporte, "Reserva citas", "HTTPS/REST")
+Rel(propietarios, masdeporte, "Gestiona empresa", "HTTPS/REST")
+Rel(administradores, masdeporte, "Administra sistema", "HTTPS/REST")
+
+Rel(masdeporte, mercadopago, "Procesa pagos", "HTTPS/REST")
+Rel(masdeporte, google, "Autenticación y calendario", "HTTPS/REST")
+Rel(masdeporte, sendgrid, "Envía notificaciones", "HTTPS/REST")
+Rel(masdeporte, mysql, "Almacena datos", "JDBC")
+
+Rel(mercadopago, masdeporte, "Webhooks de pago", "HTTPS")
+Rel(google, masdeporte, "Callbacks OAuth", "HTTPS")
+
+@enduml

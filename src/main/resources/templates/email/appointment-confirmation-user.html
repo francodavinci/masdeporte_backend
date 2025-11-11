@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmación de Turno - MasDeporte</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .appointment-details {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 5px 0;
+        }
+        .detail-label {
+            font-weight: bold;
+            color: #555;
+        }
+        .detail-value {
+            color: #333;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .status-confirmed {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            color: #666;
+            font-size: 14px;
+        }
+        .button {
+            display: inline-block;
+            background-color: #007bff;
+            color: white;
+            padding: 12px 25px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="logo">MasDeporte</div>
+        <h1>¡Turno Confirmado!</h1>
+    </div>
+
+    <!-- Corrección: Usar name directamente del User -->
+    <p>Hola <strong th:text="${appointment.user.name}">Usuario</strong>,</p>
+
+    <p>Tu turno ha sido confirmado exitosamente. Aquí tienes los detalles:</p>
+
+    <div class="appointment-details">
+        <div class="detail-row">
+            <span class="detail-label">Servicio:</span>
+            <span class="detail-value" th:text="${appointment.service.name}">Nombre del Servicio</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Empresa:</span>
+            <span class="detail-value" th:text="${appointment.company.name}">Nombre de la Empresa</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Fecha y Hora:</span>
+            <!-- Corrección: Usar #temporals para LocalDateTime -->
+            <span class="detail-value" th:text="${#temporals.format(appointment.startTime, 'dd/MM/yyyy HH:mm')}">01/01/2024 10:00</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Hora de Finalización:</span>
+            <span class="detail-value" th:text="${#temporals.format(appointment.endTime, 'HH:mm')}">12:00</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Duración:</span>
+            <span class="detail-value" th:text="${appointment.service.durationMinutes + ' minutos'}">90 minutos</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Estado:</span>
+            <!-- Corrección: Manejo del enum y clase CSS condicional -->
+            <span class="status-badge"
+                  th:class="${appointment.status.name() == 'CONFIRMED' ? 'status-confirmed' : 'status-pending'}"
+                  th:text="${appointment.status.name()}">CONFIRMED</span>
+        </div>
+        <div class="detail-row" th:if="${appointment.notes != null and !appointment.notes.isEmpty()}">
+            <span class="detail-label">Notas:</span>
+            <span class="detail-value" th:text="${appointment.notes}">Notas adicionales</span>
+        </div>
+        <div class="detail-row" th:if="${appointment.finalPrice != null}">
+            <span class="detail-label">Precio Final:</span>
+            <span class="detail-value" th:text="${'$' + appointment.finalPrice}">$10.00</span>
+        </div>
+        <div class="detail-row" th:if="${appointment.couponCode != null}">
+            <span class="detail-label">Código de Descuento:</span>
+            <span class="detail-value" th:text="${appointment.couponCode}">DESCUENTO10</span>
+        </div>
+    </div>
+
+    <p><strong>Información importante:</strong></p>
+    <ul>
+        <li>Por favor, llega 10 minutos antes de tu turno</li>
+        <li>Si necesitas cancelar o reprogramar, hazlo con al menos <span th:text="${appointment.company.cancellationHours}">24</span> horas de anticipación</li>
+        <li>En caso de dudas, contacta directamente con la empresa al teléfono: <strong th:text="${appointment.company.phone}">02284516896</strong></li>
+        <li>Dirección: <span th:text="${appointment.company.address}">Colombo 2487, B7403 Sierras Bayas, Provincia de Buenos Aires, Argentina</span></li>
+    </ul>
+
+    <div class="footer">
+        <p>Gracias por elegir MasDeporte</p>
+        <p>Este es un email automático, por favor no respondas a este mensaje.</p>
+        <p>ID de Pago: <span th:text="${appointment.paymentId}">125289344023</span></p>
+    </div>
+</div>
+</body>
+</html>

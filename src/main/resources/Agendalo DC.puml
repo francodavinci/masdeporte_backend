@@ -1,0 +1,94 @@
+@startuml
+left to right direction
+class User {
+  - id : Long
+  - email : String
+  - password : String
+  - phoneNumber : String
+  - role : String
+  + getAuthorities() : Collection<? extends GrantedAuthority>
+  + getPassword() : String
+  + getUsername() : String
+  + isAccountNonExpired() : boolean
+  + isAccountNonLocked() : boolean
+  + isCredentialsNonExpired() : boolean
+  + isEnabled() : boolean
+}
+
+class Provider {
+  - id : Long
+  - documentNumber : String
+  - phoneNumber : String
+  - user : User
+  - company : Company
+}
+
+class Company {
+  - id : Long
+  - businessName : String
+  - description : String
+  - slogan : String
+  - documentType : String
+  - documentNumber : String
+  - country : String
+  - city : String
+  - province : String
+  - zipCode : String
+  - floorNumber : String
+  - streetName : String
+  - streetNumber : String
+  - alternatePhoneNumber : String
+  - createdAt : LocalDate
+  - modifiedAt : LocalDate
+  - services : List<BusinessService>
+  - businessHours : List<BusinessHours>
+}
+
+class BusinessService {
+  - id : Long
+  - name : String
+  - company : Company
+  - serviceTypes : List<ServiceType>
+}
+
+class ServiceType {
+  - id : Long
+  - name : String
+  - price : Double
+  - description : String
+  - service : BusinessService
+  - appointmentSlots : List<AppointmentSlot>
+}
+
+class AppointmentSlot {
+  - id : Long
+  - duration : LocalTime
+  - serviceType : ServiceType
+  - appointments : List<Appointment>
+}
+
+class Appointment {
+  - id : Long
+  - appointmentTime : LocalDateTime
+  - user : User
+  - appointmentSlot : AppointmentSlot
+}
+
+class BusinessHours {
+  - id : Long
+  - dayOfWeek : DayOfWeek
+  - openingTime : LocalTime
+  - closingTime : LocalTime
+  - company : Company
+}
+
+User "1" -- "1" Provider : OneToOne
+Provider "1" -- "0..1" Company : ManyToOne
+Company "1" -- "0.*" BusinessService : OneToMany
+Company "1" -- "0.*" BusinessHours : OneToMany
+BusinessService "1" -- "0.*" ServiceType : OneToMany
+ServiceType "1" -- "0.*" AppointmentSlot : OneToMany
+AppointmentSlot "1" -- "0.*" Appointment : OneToMany
+User "0.*" -- "1" Appointment : ManyToOne
+AppointmentSlot "1" -- "0.*" Appointment : ManyToOne
+@enduml

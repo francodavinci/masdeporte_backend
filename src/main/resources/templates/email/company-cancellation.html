@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solicitud de Club Rechazada - MasDeporte</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #dc3545;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #dc3545;
+        }
+        .company-details {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 5px 0;
+        }
+        .detail-label {
+            font-weight: bold;
+            color: #555;
+        }
+        .detail-value {
+            color: #333;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .status-rejected {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .owner-info {
+            background-color: #e7f3ff;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .rejection-reason {
+            background-color: #fff3cd;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            border-left: 4px solid #ffc107;
+        }
+        .next-steps {
+            background-color: #d1ecf1;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            border-left: 4px solid #17a2b8;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            color: #666;
+            font-size: 14px;
+        }
+        .contact-info {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="logo">MasDeporte</div>
+        <h1>Solicitud de Club Rechazada</h1>
+    </div>
+
+    <p>Hola <strong th:text=" ${company.owner.name}">Propietario</strong>,</p>
+
+    <p>Lamentamos informarte que tu solicitud para crear el club <strong th:text="${company.name}">Nombre del Club</strong> en MasDeporte ha sido rechazada.</p>
+
+    <div class="company-details">
+        <h3>Detalles de la Solicitud</h3>
+        <div class="detail-row">
+            <span class="detail-label">Nombre del Club:</span>
+            <span class="detail-value" th:text=" ${company.name}">Nombre del Club</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Categoría:</span>
+            <span class="detail-value" th:text=" ${company.category}">Categoría</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Dirección:</span>
+            <span class="detail-value" th:text=" ${company.address}">Dirección del Club</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Teléfono:</span>
+            <span class="detail-value" th:text=" ${company.phone}">Teléfono</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Estado:</span>
+            <span class="status-badge status-rejected"> RECHAZADO</span>
+        </div>
+    </div>
+
+    <div class="owner-info">
+        <h3>Información del Solicitante</h3>
+        <div class="detail-row">
+            <span class="detail-label">Nombre:</span>
+            <span class="detail-value" th:text=" ${company.owner.name}">Nombre del Propietario</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Email:</span>
+            <span class="detail-value" th:text=" ${company.owner.email}">email@propietario.com</span>
+        </div>
+    </div>
+
+    <div class="rejection-reason">
+        <h3>📋 Motivo del Rechazo</h3>
+        <p th:text=" ${reason}">Aquí se especificará el motivo específico del rechazo de la solicitud.</p>
+    </div>
+
+    <div class="next-steps">
+        <h3>🔄 Próximos Pasos</h3>
+        <ul>
+            <li>Revisa los motivos del rechazo y corrige los puntos mencionados</li>
+            <li>Puedes volver a enviar una nueva solicitud cuando hayas solucionado los problemas</li>
+            <li>Si tienes dudas, puedes contactar a nuestro equipo de soporte</li>
+        </ul>
+    </div>
+
+    <div class="contact-info">
+        <h3>📞 ¿Necesitas Ayuda?</h3>
+        <p>Si tienes preguntas sobre este rechazo o necesitas asistencia para mejorar tu solicitud, no dudes en contactarnos:</p>
+        <p><strong>Email:</strong> soporte@masdeporte.com</p>
+        <p><strong>Teléfono:</strong> +54 11 1234-5678</p>
+    </div>
+
+    <p><strong>Gracias por tu interés en formar parte de MasDeporte.</strong> Esperamos poder trabajar contigo en el futuro.</p>
+
+    <div class="footer">
+        <p>Gracias por usar MasDeporte</p>
+        <p>Este es un email automático, por favor no respondas a este mensaje.</p>
+    </div>
+</div>
+</body>
+</html>

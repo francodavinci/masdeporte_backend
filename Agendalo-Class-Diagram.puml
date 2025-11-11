@@ -1,0 +1,256 @@
+@startuml Agendalo Backend - Diagrama de Clases
+
+!theme plain
+skinparam class {
+    BackgroundColor White
+    BorderColor Black
+    ArrowColor Black
+}
+
+' Definir enums
+enum AppointmentStatus {
+    PENDING
+    CONFIRMED
+    CANCELLED
+    COMPLETED
+}
+
+enum CompanyStatus {
+    PENDING
+    CANCELLED
+    ACCEPTED
+    DELETED
+}
+
+enum ImageType {
+    PROFILE
+    GALLERY
+    LOGO
+}
+
+' Entidades principales
+class User {
+    - Long id
+    - String email
+    - String password
+    - String phoneNumber
+    - String name
+    - String role
+    - String profileImageUrl
+    - LocalDateTime registrationDate
+    --
+    + getAuthorities()
+    + getUsername()
+    + isAccountNonExpired()
+    + isAccountNonLocked()
+    + isCredentialsNonExpired()
+    + isEnabled()
+    + addCompany(Company)
+    + removeCompany(Company)
+    + addAppointment(Appointment)
+    + removeAppointment(Appointment)
+}
+
+class Company {
+    - Long id
+    - String name
+    - String urlSlug
+    - String category
+    - String address
+    - Double latitude
+    - Double longitude
+    - String phone
+    - Integer minAdvanceDays
+    - Integer maxAdvanceDays
+    - Boolean hasTimeBetweenTurns
+    - Integer minutesBetweenTurns
+    - CompanyStatus status
+    - LocalDateTime registrationDate
+    - Integer cancellationHours
+    --
+    + addService(BusinessService)
+}
+
+class Appointment {
+    - Long id
+    - LocalDateTime startTime
+    - LocalDateTime endTime
+    - AppointmentStatus status
+    - String notes
+    - LocalDateTime createdAt
+    - LocalDateTime updatedAt
+    - String paymentId
+    - Double finalPrice
+    - String couponCode
+    --
+    + onCreate()
+    + onUpdate()
+}
+
+class BusinessService {
+    - Long id
+    - String name
+    - String description
+    - Integer durationMinutes
+    - Double price
+}
+
+class BusinessHours {
+    - Long id
+    - DayOfWeek dayOfWeek
+    - LocalTime openingTime
+    - LocalTime closingTime
+    - Boolean workingDay
+}
+
+class Comment {
+    - Long id
+    - String userName
+    - Integer points
+    - String description
+    - LocalDateTime createdAt
+    --
+    + onCreate()
+}
+
+class Coupon {
+    - Long id
+    - String code
+    - String name
+    - String description
+    - Double discountPercentage
+    - Double maxDiscountAmount
+    - LocalDateTime validFrom
+    - LocalDateTime validUntil
+    - Integer maxUses
+    - Integer currentUses
+    - Boolean isActive
+    - LocalDateTime createdAt
+    - LocalDateTime updatedAt
+    --
+    + isValid()
+    + canBeUsed()
+    + incrementUsage()
+    + onCreate()
+    + onUpdate()
+}
+
+class CouponUsage {
+    - Long id
+    - Double originalAmount
+    - Double discountAmount
+    - Double finalAmount
+    - LocalDateTime usedAt
+    --
+    + onCreate()
+}
+
+class Image {
+    - Long id
+    - String name
+    - String type
+    - byte[] data
+    - ImageType imageType
+}
+
+class Provider {
+    - Long id
+}
+
+class MercadoPagoAccount {
+    - Long id
+    - String accessToken
+    - String refreshToken
+    - String publicKey
+    - String userId
+    - String status
+    - LocalDateTime expiresAt
+    - LocalDateTime lastSync
+}
+
+class PaymentPreference {
+    - Long id
+    - String preferenceId
+    - LocalDateTime startTime
+    - String notes
+    - Double amount
+    - String status
+    - LocalDateTime createdAt
+    - LocalDateTime updatedAt
+    - String externalReference
+    --
+    + onCreate()
+    + onUpdate()
+}
+
+class GoogleCalendarToken {
+    - Long id
+    - String accessToken
+    - String refreshToken
+    - LocalDateTime expiresAt
+    - LocalDateTime createdAt
+    --
+    + onCreate()
+}
+
+' Relaciones principales
+User ||--o{ Company : "posee"
+User ||--o{ Appointment : "reserva"
+User ||--o{ Comment : "escribe"
+User ||--o{ CouponUsage : "usa"
+User ||--o| Provider : "es"
+
+Company ||--o{ BusinessService : "ofrece"
+Company ||--o{ BusinessHours : "tiene"
+Company ||--o{ Appointment : "recibe"
+Company ||--o{ Comment : "recibe"
+Company ||--o{ Coupon : "crea"
+Company ||--o{ Image : "tiene"
+Company ||--o| MercadoPagoAccount : "tiene"
+Company ||--o| GoogleCalendarToken : "tiene"
+
+BusinessService ||--o{ Appointment : "reservado_para"
+BusinessService ||--o{ PaymentPreference : "genera"
+
+Appointment }o--|| BusinessService : "para"
+Appointment }o--|| User : "reservado_por"
+Appointment }o--|| Company : "en"
+Appointment ||--o{ CouponUsage : "usa"
+
+Coupon ||--o{ CouponUsage : "registrado_en"
+
+' Relaciones de herencia/implementación
+User ..|> UserDetails : implements
+
+' Notas explicativas
+note right of User
+  Entidad principal que representa
+  usuarios del sistema (clientes y
+  propietarios de empresas)
+end note
+
+note right of Company
+  Representa las empresas que
+  ofrecen servicios y reciben
+  citas de los usuarios
+end note
+
+note right of Appointment
+  Representa las citas/turnos
+  que los usuarios reservan
+  en las empresas
+end note
+
+note right of BusinessService
+  Servicios específicos que
+  ofrecen las empresas
+  (ej: corte de pelo, consulta médica)
+end note
+
+note right of Coupon
+  Sistema de cupones de descuento
+  que pueden crear las empresas
+  para sus servicios
+end note
+
+@enduml

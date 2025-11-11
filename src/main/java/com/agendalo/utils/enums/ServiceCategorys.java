@@ -1,0 +1,5 @@
+package com.agendalo.utils.enums;
+
+public enum ServiceCategorys {
+    CONSULTORIO, CENTRO_DE_ESTETICA, SPA, MAQUILLAJE, UNIAS, CEJAS_Y_PESTANIAS, MASAJES, DEPILACION, PELUQUERIA, BARBERIA, OTRO;
+}

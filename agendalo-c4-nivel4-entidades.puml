@@ -1,0 +1,160 @@
+@startuml Agendalo_Entities_Level4
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+title Nivel 4: Diagrama de Entidades de Dominio - Sistema Agendalo
+
+entity "USER" as user {
+    * id : Long PK
+    --
+    * email : String UK
+    * password : String
+    phoneNumber : String
+    name : String
+    * role : String
+    profileImageUrl : String
+}
+
+entity "COMPANY" as company {
+    * id : Long PK
+    --
+    * owner_id : Long FK
+    * name : String
+    * urlSlug : String UK
+    * category : String
+    address : String
+    latitude : Double
+    longitude : Double
+    phone : String
+    * minAdvanceDays : Integer
+    * maxAdvanceDays : Integer
+    hasTimeBetweenTurns : Boolean
+    minutesBetweenTurns : Integer
+    * status : CompanyStatus
+    * registrationDate : LocalDateTime
+    * cancellationHours : Integer
+}
+
+entity "BUSINESS_SERVICE" as businessService {
+    * id : Long PK
+    --
+    * company_id : Long FK
+    * name : String
+    description : String
+    * durationMinutes : Integer
+    * price : Double
+}
+
+entity "APPOINTMENT" as appointment {
+    * id : Long PK
+    --
+    * service_id : Long FK
+    * user_id : Long FK
+    * company_id : Long FK
+    * startTime : LocalDateTime
+    * endTime : LocalDateTime
+    * status : AppointmentStatus
+    notes : String
+    * paymentId : String
+    finalPrice : Double
+    couponCode : String
+    createdAt : LocalDateTime
+    updatedAt : LocalDateTime
+}
+
+entity "PAYMENT_PREFERENCE" as paymentPreference {
+    * id : Long PK
+    --
+    * preferenceId : String UK
+    * service_id : Long FK
+    * user_id : Long FK
+    * company_id : Long FK
+    * startTime : LocalDateTime
+    notes : String
+    * amount : Double
+    status : String
+    externalReference : String
+    createdAt : LocalDateTime
+    updatedAt : LocalDateTime
+}
+
+entity "BUSINESS_HOURS" as businessHours {
+    * id : Long PK
+    --
+    * company_id : Long FK
+    * dayOfWeek : DayOfWeek
+    * openingTime : LocalTime
+    * closingTime : LocalTime
+    * workingDay : Boolean
+}
+
+entity "PROVIDER" as provider {
+    * id : Long PK
+    --
+    * user_id : Long FK
+    * company_id : Long FK
+}
+
+entity "IMAGE" as image {
+    * id : Long PK
+    --
+    * company_id : Long FK
+    fileName : String
+    originalName : String
+    contentType : String
+    size : Long
+    url : String
+    type : ImageType
+}
+
+entity "COMMENT" as comment {
+    * id : Long PK
+    --
+    * appointment_id : Long FK
+    content : String
+    rating : Integer
+    createdAt : LocalDateTime
+}
+
+entity "COUPON" as coupon {
+    * id : Long PK
+    --
+    * code : String UK
+    description : String
+    discountPercentage : Double
+    discountAmount : Double
+    validFrom : LocalDateTime
+    validUntil : LocalDateTime
+    maxUses : Integer
+    currentUses : Integer
+    isActive : Boolean
+}
+
+entity "CONTACT_FORM" as contactForm {
+    * id : Long PK
+    --
+    name : String
+    email : String
+    subject : String
+    message : String
+    createdAt : LocalDateTime
+    isRead : Boolean
+}
+
+' Relaciones
+user ||--o{ company : "owns"
+user ||--o{ appointment : "books"
+user ||--o{ provider : "is"
+
+company ||--o{ businessService : "offers"
+company ||--o{ businessHours : "has"
+company ||--o{ appointment : "receives"
+company ||--o{ image : "has"
+company ||--o{ provider : "employs"
+
+businessService ||--o{ appointment : "booked_for"
+businessService ||--o{ paymentPreference : "generates"
+
+appointment ||--|| paymentPreference : "has"
+appointment ||--o{ comment : "has"
+
+@enduml

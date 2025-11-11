@@ -1,0 +1,80 @@
+/* Agregar al final del archivo PaymentsPage.css */
+
+/* Indicador de webhooks en tiempo real */
+.webhook-indicator {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: #e3f2fd;
+  color: #1976d2;
+  border: 1px solid #bbdefb;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.webhook-indicator .spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #1976d2;
+  border-top: 2px solid transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Mejoras en las tarjetas de preferencias */
+.preference-card {
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.preference-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+
+.preference-card.pending {
+  border-left-color: #ffc107;
+}
+
+.preference-card.approved {
+  border-left-color: #28a745;
+}
+
+.preference-card.cancelled {
+  border-left-color: #dc3545;
+}
+
+.preference-card.rejected {
+  border-left-color: #dc3545;
+}
+
+/* Animaciones para notificaciones */
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.preference-card.pending .status-badge {
+  animation: pulse 2s infinite;
+}
+
+/* Mejoras en el contador de pendientes */
+.tab-btn .pending-count {
+  background: #ffc107;
+  color: #000;
+  border-radius: 50%;
+  padding: 2px 6px;
+  font-size: 12px;
+  margin-left: 5px;
+  min-width: 18px;
+  text-align: center;
+} 
